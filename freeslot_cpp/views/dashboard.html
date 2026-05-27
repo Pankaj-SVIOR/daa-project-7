@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Teacher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+    width: 240px; background: #1e293b; border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh; z-index: 100;
+}
+.sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; color: #fff; }
+.sidebar-logo p  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; color: rgba(255,255,255,0.55); font-size: 14px;
+    text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+}
+.nav-item:hover  { color: #fff; background: rgba(255,255,255,0.05); }
+.nav-item.active { color: #6366f1; border-left-color: #6366f1; background: rgba(99,102,241,0.08); }
+.nav-icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-bottom { margin-top: auto; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.teacher-name  { font-size: 13px; font-weight: 600; color: #fff; }
+.teacher-dept  { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.btn-logout {
+    display: block; width: 100%; background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.2); color: #fca5a5;
+    border-radius: 8px; padding: 10px; font-size: 13px;
+    cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 12px;
+    text-align: center; text-decoration: none; transition: background 0.2s;
+}
+.btn-logout:hover { background: rgba(239,68,68,0.2); }
+
+/* Main content */
+.main { margin-left: 240px; flex: 1; padding: 32px; }
+.page-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.page-sub   { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 32px; }
+
+/* Stats grid */
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 32px; }
+.stat-card {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 24px;
+}
+.stat-icon { font-size: 28px; margin-bottom: 12px; }
+.stat-value { font-size: 28px; font-weight: 700; color: #fff; }
+.stat-label { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+/* Content grid */
+.content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.card {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 24px;
+}
+.card-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+
+/* Quick action buttons */
+.quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.qa-btn {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 16px; text-decoration: none;
+    color: #e2e8f0; font-size: 14px; font-weight: 500; transition: all 0.2s;
+}
+.qa-btn:hover { background: rgba(99,102,241,0.1); border-color: rgba(99,102,241,0.3); color: #a5b4fc; }
+.qa-icon { font-size: 24px; }
+
+/* Classes list */
+.class-item {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.class-item:last-child { border-bottom: none; }
+.class-time {
+    background: rgba(99,102,241,0.15); color: #a5b4fc;
+    border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: 600;
+    white-space: nowrap; min-width: 100px; text-align: center;
+}
+.class-info { flex: 1; }
+.class-subject { font-size: 14px; font-weight: 600; color: #fff; }
+.class-room    { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+/* Booking list */
+.booking-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.booking-item:last-child { border-bottom: none; }
+.booking-left { font-size: 14px; color: #fff; }
+.booking-meta { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+.badge {
+    background: rgba(34,197,94,0.15); color: #86efac;
+    border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 600;
+}
+.empty-msg { color: rgba(255,255,255,0.3); font-size: 14px; text-align: center; padding: 20px 0; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h2>🎓 Teacher Portal</h2>
+        <p>Free Slot Finder System</p>
+    </div>
+
+    <a href="/dashboard"         class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/today-classes"     class="nav-item"><span class="nav-icon">📅</span> Today's Classes</a>
+    <a href="/free-slots-page"   class="nav-item"><span class="nav-icon">🔍</span> Find Free Slots</a>
+    <a href="/book-room-page"    class="nav-item"><span class="nav-icon">📌</span> Book a Room</a>
+    <a href="/weekly-schedule"   class="nav-item"><span class="nav-icon">🗓️</span> Weekly Schedule</a>
+    <a href="/profile"           class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+
+    <div class="sidebar-bottom">
+        <div class="teacher-name" id="sidebarName">Loading...</div>
+        <div class="teacher-dept" id="sidebarDept">Department</div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+    <div class="page-title">Welcome back 👋</div>
+    <div class="page-sub" id="welcomeMsg">Loading your dashboard...</div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-value" id="classCount">-</div>
+            <div class="stat-label">Classes Today</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏫</div>
+            <div class="stat-value" id="freeRoomsCount">-</div>
+            <div class="stat-label">Free Rooms Now</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📌</div>
+            <div class="stat-value" id="bookingCount">-</div>
+            <div class="stat-label">My Bookings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📆</div>
+            <div class="stat-value" id="todayDay">-</div>
+            <div class="stat-label">Today's Day</div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Today's Classes -->
+        <div class="card">
+            <div class="card-title">📅 Today's Classes</div>
+            <div id="classList"><div class="empty-msg">Loading...</div></div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-title">⚡ Quick Actions</div>
+            <div class="quick-actions">
+                <a href="/today-classes"   class="qa-btn"><span class="qa-icon">📅</span> Today's Classes</a>
+                <a href="/free-slots-page" class="qa-btn"><span class="qa-icon">🔍</span> Find Free Room</a>
+                <a href="/book-room-page"  class="qa-btn"><span class="qa-icon">📌</span> Book a Room</a>
+                <a href="/weekly-schedule" class="qa-btn"><span class="qa-icon">🗓️</span> Weekly Schedule</a>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="card" style="grid-column:1/-1">
+            <div class="card-title">📌 Recent Room Bookings</div>
+            <div id="bookingList"><div class="empty-msg">No bookings yet.</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const days = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+const todayName = days[new Date().getDay()];
+document.getElementById('todayDay').textContent = todayName;
+
+// Load teacher info from session
+fetch('/api/me')
+    .then(r => r.json())
+    .then(me => {
+        if (me.error) { window.location.href = '/login'; return; }
+        document.getElementById('sidebarName').textContent = me.name;
+        document.getElementById('sidebarDept').textContent = me.department || 'Faculty';
+        document.getElementById('welcomeMsg').textContent = 'Hello, ' + me.name + ' — ' + new Date().toDateString();
+
+        // Load today's classes for this teacher
+        fetch('/teacher_classes_today/' + me.teacher_id)
+            .then(r => r.json())
+            .then(classes => {
+                document.getElementById('classCount').textContent = classes.length;
+                const div = document.getElementById('classList');
+                if (classes.length === 0) {
+                    div.innerHTML = '<div class="empty-msg">No classes today 🎉</div>';
+                    return;
+                }
+                div.innerHTML = classes.map(c =>
+                    `<div class="class-item">
+                        <div class="class-time">${c.slot}</div>
+                        <div class="class-info">
+                            <div class="class-subject">${c.subject}</div>
+                            <div class="class-room">📍 ${c.room}</div>
+                        </div>
+                    </div>`
+                ).join('');
+            });
+    })
+    .catch(() => window.location.href = '/login');
+
+// Load free rooms count (first slot)
+fetch('/free_rooms_today')
+    .then(r => r.json())
+    .then(data => {
+        let total = 0;
+        data.forEach(s => total += s.free_rooms.length);
+        document.getElementById('freeRoomsCount').textContent = total > 0 ? data[0].free_rooms.length : 0;
+    });
+
+// Load recent bookings
+fetch('/today_bookings')
+    .then(r => r.json())
+    .then(bookings => {
+        document.getElementById('bookingCount').textContent = bookings.length;
+        const div = document.getElementById('bookingList');
+        if (bookings.length === 0) {
+            div.innerHTML = '<div class="empty-msg">No bookings yet.</div>';
+            return;
+        }
+        div.innerHTML = bookings.slice(0,5).map(b =>
+            `<div class="booking-item">
+                <div class="booking-left">
+                    <div>${b.teacher} → ${b.room}</div>
+                    <div class="booking-meta">📅 ${b.date} &nbsp; ⏰ ${b.slot}</div>
+                </div>
+                <span class="badge">Approved</span>
+            </div>`
+        ).join('');
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Free Slots — Teacher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+.sidebar {
+    width: 240px; background: #1e293b; border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh;
+}
+.sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; color: #fff; }
+.sidebar-logo p  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; color: rgba(255,255,255,0.55); font-size: 14px;
+    text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+}
+.nav-item:hover  { color: #fff; background: rgba(255,255,255,0.05); }
+.nav-item.active { color: #6366f1; border-left-color: #6366f1; background: rgba(99,102,241,0.08); }
+.nav-icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-bottom { margin-top: auto; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.teacher-name { font-size: 13px; font-weight: 600; color: #fff; }
+.btn-logout {
+    display: block; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; border-radius: 8px; padding: 10px; font-size: 13px;
+    margin-top: 12px; text-align: center; text-decoration: none;
+}
+.main { margin-left: 240px; flex: 1; padding: 32px; }
+.page-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.page-sub   { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 32px; }
+
+.filter-bar {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 24px; margin-bottom: 24px;
+    display: flex; gap: 16px; align-items: flex-end;
+}
+.filter-group { flex: 1; }
+label { font-size: 12px; color: rgba(255,255,255,0.5); display: block; margin-bottom: 8px; }
+select, input {
+    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 11px 14px; color: #fff; font-size: 14px;
+    font-family: 'Inter',sans-serif; outline: none;
+}
+select:focus, input:focus { border-color: #6366f1; }
+select option { background: #1e293b; }
+.btn-search {
+    background: linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none;
+    border-radius:10px; padding:12px 28px; font-size:14px; font-weight:600;
+    cursor:pointer; font-family:'Inter',sans-serif; white-space:nowrap; transition:opacity 0.2s;
+}
+.btn-search:hover { opacity:0.9; }
+
+.result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 16px; }
+.room-card {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 20px; text-align: center; transition: transform 0.2s;
+}
+.room-card:hover { transform: translateY(-3px); border-color: rgba(99,102,241,0.3); }
+.room-icon { font-size: 32px; margin-bottom: 12px; }
+.room-name { font-size: 14px; font-weight: 600; color: #fff; }
+.free-badge { background: rgba(34,197,94,0.15); color:#86efac; border-radius:6px; padding:4px 10px; font-size:11px; margin-top:8px; display:inline-block; }
+
+.slot-section { margin-bottom: 32px; }
+.slot-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+}
+.slot-time {
+    background: linear-gradient(135deg,#6366f1,#8b5cf6);
+    color:#fff; border-radius:8px; padding:6px 14px; font-size:13px; font-weight:600;
+}
+.slot-count { color: rgba(255,255,255,0.4); font-size:13px; }
+.empty-msg { color: rgba(255,255,255,0.3); font-size:14px; text-align:center; padding:40px 0; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h2>🎓 Teacher Portal</h2>
+        <p>Free Slot Finder System</p>
+    </div>
+    <a href="/dashboard"         class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/today-classes"     class="nav-item"><span class="nav-icon">📅</span> Today's Classes</a>
+    <a href="/free-slots-page"   class="nav-item active"><span class="nav-icon">🔍</span> Find Free Slots</a>
+    <a href="/book-room-page"    class="nav-item"><span class="nav-icon">📌</span> Book a Room</a>
+    <a href="/weekly-schedule"   class="nav-item"><span class="nav-icon">🗓️</span> Weekly Schedule</a>
+    <a href="/profile"           class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <div class="sidebar-bottom">
+        <div class="teacher-name" id="sidebarName">Loading...</div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title">🔍 Find Free Rooms</div>
+    <div class="page-sub">See which rooms are available right now</div>
+
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label>Day</label>
+            <select id="daySelect">
+                <option value="MON">Monday</option>
+                <option value="TUE">Tuesday</option>
+                <option value="WED">Wednesday</option>
+                <option value="THU">Thursday</option>
+                <option value="FRI">Friday</option>
+                <option value="SAT">Saturday</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Slot</label>
+            <select id="slotSelect">
+                <option value="1">Slot 1 — 08:00–08:55</option>
+                <option value="2">Slot 2 — 08:55–09:50</option>
+                <option value="3">Slot 3 — 10:10–11:05</option>
+                <option value="4">Slot 4 — 11:05–12:00</option>
+                <option value="5">Slot 5 — 12:00–12:55</option>
+                <option value="6">Slot 6 — 12:55–01:50</option>
+                <option value="7">Slot 7 — 02:10–03:05</option>
+                <option value="8">Slot 8 — 03:05–04:00</option>
+                <option value="9">Slot 9 — 04:00–04:55</option>
+                <option value="10">Slot 10 — 04:55–05:50</option>
+            </select>
+        </div>
+        <button class="btn-search" onclick="searchFreeRooms()">Search</button>
+        <button class="btn-search" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1)" onclick="loadTodayAll()">Today All Slots</button>
+    </div>
+
+    <div id="results"><div class="empty-msg">Select a day and slot to search</div></div>
+</div>
+
+<script>
+fetch('/api/me').then(r=>r.json()).then(me => {
+    if (me.error) { window.location.href='/login'; return; }
+    document.getElementById('sidebarName').textContent = me.name;
+    // Set today's day as default
+    const days=["SUN","MON","TUE","WED","THU","FRI","SAT"];
+    document.getElementById('daySelect').value = days[new Date().getDay()] || 'MON';
+}).catch(() => window.location.href='/login');
+
+function searchFreeRooms() {
+    const day  = document.getElementById('daySelect').value;
+    const slot = document.getElementById('slotSelect').value;
+    const slotTimes = {1:"08:00-08:55",2:"08:55-09:50",3:"10:10-11:05",4:"11:05-12:00",
+                       5:"12:00-12:55",6:"12:55-01:50",7:"02:10-03:05",8:"03:05-04:00",9:"04:00-04:55",10:"04:55-05:50"};
+    document.getElementById('results').innerHTML = '<div class="empty-msg">Searching...</div>';
+
+    fetch('/free_rooms?day='+day+'&slot='+slot)
+        .then(r => r.json())
+        .then(data => {
+            const rooms = data.free_rooms || [];
+            if (!rooms.length) {
+                document.getElementById('results').innerHTML = '<div class="empty-msg">No free rooms for this slot.</div>';
+                return;
+            }
+            document.getElementById('results').innerHTML = `
+                <div class="slot-section">
+                    <div class="slot-header">
+                        <span class="slot-time">${slotTimes[slot]}</span>
+                        <span class="slot-count">${rooms.length} rooms free on ${day}</span>
+                    </div>
+                    <div class="result-grid">
+                        ${rooms.map(r => `
+                            <div class="room-card">
+                                <div class="room-icon">🏫</div>
+                                <div class="room-name">${r.room_name}</div>
+                                <div class="free-badge">Available</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+        });
+}
+
+function loadTodayAll() {
+    document.getElementById('results').innerHTML = '<div class="empty-msg">Loading all slots...</div>';
+    fetch('/free_rooms_today')
+        .then(r => r.json())
+        .then(data => {
+            // Using sorting — slots already sorted 1..10 by server
+            document.getElementById('results').innerHTML = data.map(s => `
+                <div class="slot-section">
+                    <div class="slot-header">
+                        <span class="slot-time">${s.slot}</span>
+                        <span class="slot-count">${s.free_rooms.length} rooms free</span>
+                    </div>
+                    <div class="result-grid">
+                        ${s.free_rooms.map(r => `
+                            <div class="room-card">
+                                <div class="room-icon">🏫</div>
+                                <div class="room-name">${r}</div>
+                                <div class="free-badge">Free</div>
+                            </div>`).join('')}
+                    </div>
+                </div>`).join('');
+        });
+}
+</script>
+
+</body>
+</html>

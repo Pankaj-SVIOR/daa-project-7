@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Book a Room — Teacher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+.sidebar {
+    width: 240px; background: #1e293b; border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh;
+}
+.sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; color: #fff; }
+.sidebar-logo p  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; color: rgba(255,255,255,0.55); font-size: 14px;
+    text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+}
+.nav-item:hover  { color: #fff; background: rgba(255,255,255,0.05); }
+.nav-item.active { color: #6366f1; border-left-color: #6366f1; background: rgba(99,102,241,0.08); }
+.nav-icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-bottom { margin-top: auto; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.teacher-name { font-size: 13px; font-weight: 600; color: #fff; }
+.btn-logout {
+    display: block; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; border-radius: 8px; padding: 10px; font-size: 13px;
+    margin-top: 12px; text-align: center; text-decoration: none;
+}
+.main { margin-left: 240px; flex: 1; padding: 32px; }
+.page-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.page-sub   { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 32px; }
+
+.booking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; }
+.card {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 28px;
+}
+.card-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 24px; }
+label { font-size: 12px; color: rgba(255,255,255,0.5); display: block; margin-bottom: 8px; letter-spacing: 0.4px; }
+select, input[type=text], input[type=date] {
+    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 12px 14px; color: #fff; font-size: 14px;
+    font-family: 'Inter',sans-serif; outline: none; margin-bottom: 20px;
+}
+select:focus, input:focus { border-color: #6366f1; }
+select option { background: #1e293b; }
+input::placeholder { color: rgba(255,255,255,0.25); }
+.btn-book {
+    width: 100%; background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff; border: none; border-radius: 10px;
+    padding: 14px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: 'Inter',sans-serif; transition: opacity 0.2s;
+}
+.btn-book:hover { opacity: 0.9; }
+.btn-undo {
+    width: 100%; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; border-radius: 10px; padding: 12px;
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter',sans-serif;
+    margin-top: 12px; transition: background 0.2s;
+}
+.btn-undo:hover { background: rgba(239,68,68,0.2); }
+.msg-box {
+    border-radius: 10px; padding: 12px 16px; font-size: 14px; margin-bottom: 16px; display: none;
+}
+.msg-ok  { background: rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3); color:#86efac; }
+.msg-err { background: rgba(239,68,68,0.15);  border:1px solid rgba(239,68,68,0.3);  color:#fca5a5; }
+
+.bookings-card { grid-column: 1/-1; }
+.booking-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.booking-row:last-child { border-bottom: none; }
+.b-left { font-size: 14px; color: #fff; }
+.b-meta { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+.badge { background: rgba(34,197,94,0.15); color: #86efac; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:600; }
+.empty-msg { color: rgba(255,255,255,0.3); font-size:14px; text-align:center; padding:20px 0; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h2>🎓 Teacher Portal</h2>
+        <p>Free Slot Finder System</p>
+    </div>
+    <a href="/dashboard"         class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/today-classes"     class="nav-item"><span class="nav-icon">📅</span> Today's Classes</a>
+    <a href="/free-slots-page"   class="nav-item"><span class="nav-icon">🔍</span> Find Free Slots</a>
+    <a href="/book-room-page"    class="nav-item active"><span class="nav-icon">📌</span> Book a Room</a>
+    <a href="/weekly-schedule"   class="nav-item"><span class="nav-icon">🗓️</span> Weekly Schedule</a>
+    <a href="/profile"           class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <div class="sidebar-bottom">
+        <div class="teacher-name" id="sidebarName">Loading...</div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title">📌 Book a Room</div>
+    <div class="page-sub">Reserve a classroom or lab for your use</div>
+
+    <div class="booking-grid">
+        <!-- Booking Form -->
+        <div class="card">
+            <div class="card-title">New Booking</div>
+            <div id="msgBox" class="msg-box"></div>
+
+            <label>Select Room</label>
+            <select id="roomSelect">
+                <option value="">Loading rooms...</option>
+            </select>
+
+            <label>Date (enter day like MON, TUE...)</label>
+            <input type="text" id="dateInput" placeholder="e.g. MON" maxlength="3">
+
+            <label>Time Slot</label>
+            <select id="slotSelect">
+                <option value="1">Slot 1 — 08:00–08:55</option>
+                <option value="2">Slot 2 — 08:55–09:50</option>
+                <option value="3">Slot 3 — 10:10–11:05</option>
+                <option value="4">Slot 4 — 11:05–12:00</option>
+                <option value="5">Slot 5 — 12:00–12:55</option>
+                <option value="6">Slot 6 — 12:55–01:50</option>
+                <option value="7">Slot 7 — 02:10–03:05</option>
+                <option value="8">Slot 8 — 03:05–04:00</option>
+                <option value="9">Slot 9 — 04:00–04:55</option>
+                <option value="10">Slot 10 — 04:55–05:50</option>
+            </select>
+
+            <button class="btn-book" onclick="bookRoom()">📌 Book Room</button>
+            <button class="btn-undo" onclick="undoBooking()">↩ Undo Last Booking</button>
+        </div>
+
+        <!-- Info panel -->
+        <div class="card">
+            <div class="card-title">📋 How it works</div>
+            <div style="color:rgba(255,255,255,0.5);font-size:14px;line-height:2">
+                <p>1. Select a free room from the list</p>
+                <p>2. Enter the day (MON, TUE, WED, THU, FRI, SAT)</p>
+                <p>3. Choose a time slot</p>
+                <p>4. Click <b style="color:#a5b4fc">Book Room</b></p>
+                <br>
+                <p style="color:rgba(255,255,255,0.3);font-size:12px">
+                    ⚠️ You cannot book a room if it's already occupied in the timetable or by another booking at that slot.
+                </p>
+                <br>
+                <p>💡 Use <b style="color:#fca5a5">Undo</b> to cancel your last booking.</p>
+            </div>
+        </div>
+
+        <!-- Recent bookings -->
+        <div class="card bookings-card">
+            <div class="card-title">📋 All Approved Bookings</div>
+            <div id="bookingList"><div class="empty-msg">Loading...</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+let myTeacherId = null;
+
+fetch('/api/me')
+    .then(r => r.json())
+    .then(me => {
+        if (me.error) { window.location.href = '/login'; return; }
+        document.getElementById('sidebarName').textContent = me.name;
+        myTeacherId = me.teacher_id;
+    })
+    .catch(() => window.location.href = '/login');
+
+// Load rooms
+fetch('/teachers')  // reuse to check server is up
+    .then(() => fetch('/free_rooms?day=MON&slot=1'))
+    .then(r => r.json())
+    .then(data => {
+        const sel = document.getElementById('roomSelect');
+        sel.innerHTML = '<option value="">Select a room</option>';
+        (data.free_rooms || []).forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.room_id;
+            opt.textContent = r.room_name;
+            sel.appendChild(opt);
+        });
+    });
+
+// Load all rooms (not just free)
+fetch('/api/rooms')
+    .then(r => r.json())
+    .then(rooms => {
+        const sel = document.getElementById('roomSelect');
+        sel.innerHTML = '<option value="">Select a room</option>';
+        rooms.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.room_id;
+            opt.textContent = r.room_name;
+            sel.appendChild(opt);
+        });
+    }).catch(() => {});
+
+function showMsg(msg, type) {
+    const box = document.getElementById('msgBox');
+    box.textContent = msg;
+    box.className = 'msg-box ' + (type === 'ok' ? 'msg-ok' : 'msg-err');
+    box.style.display = 'block';
+    setTimeout(() => { box.style.display = 'none'; }, 4000);
+}
+
+function bookRoom() {
+    if (!myTeacherId) { showMsg('Please wait, loading...', 'err'); return; }
+    const room = document.getElementById('roomSelect').value;
+    const date = document.getElementById('dateInput').value.trim().toUpperCase();
+    const slot = document.getElementById('slotSelect').value;
+    if (!room || !date || !slot) { showMsg('Please fill all fields.', 'err'); return; }
+
+    fetch('/book_room', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ teacher_id: myTeacherId, room_id: room, date: date, slot: slot })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status === 'success') { showMsg('✅ ' + d.message, 'ok'); loadBookings(); }
+        else showMsg('❌ ' + d.message, 'err');
+    });
+}
+
+function undoBooking() {
+    fetch('/undo_booking', { method: 'POST' })
+        .then(r => r.json())
+        .then(d => {
+            if (d.status === 'success') { showMsg('✅ Undo successful!', 'ok'); loadBookings(); }
+            else showMsg('❌ ' + d.message, 'err');
+        });
+}
+
+function loadBookings() {
+    fetch('/today_bookings')
+        .then(r => r.json())
+        .then(list => {
+            const div = document.getElementById('bookingList');
+            if (!list.length) { div.innerHTML = '<div class="empty-msg">No bookings yet.</div>'; return; }
+            div.innerHTML = list.map(b =>
+                `<div class="booking-row">
+                    <div class="b-left">
+                        <div>${b.teacher} → ${b.room}</div>
+                        <div class="b-meta">📅 ${b.date} &nbsp; ⏰ ${b.slot}</div>
+                    </div>
+                    <span class="badge">Approved</span>
+                </div>`
+            ).join('');
+        });
+}
+loadBookings();
+</script>
+
+</body>
+</html>

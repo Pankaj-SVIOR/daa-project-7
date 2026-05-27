@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Today's Classes — Teacher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+.sidebar {
+    width: 240px; background: #1e293b; border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh;
+}
+.sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; color: #fff; }
+.sidebar-logo p  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; color: rgba(255,255,255,0.55); font-size: 14px;
+    text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+}
+.nav-item:hover  { color: #fff; background: rgba(255,255,255,0.05); }
+.nav-item.active { color: #6366f1; border-left-color: #6366f1; background: rgba(99,102,241,0.08); }
+.nav-icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-bottom { margin-top: auto; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.teacher-name { font-size: 13px; font-weight: 600; color: #fff; }
+.btn-logout {
+    display: block; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; border-radius: 8px; padding: 10px; font-size: 13px;
+    cursor: pointer; margin-top: 12px; text-align: center; text-decoration: none;
+}
+.main { margin-left: 240px; flex: 1; padding: 32px; }
+.page-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.page-sub   { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 32px; }
+
+.day-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff; border-radius: 8px; padding: 6px 16px;
+    font-size: 13px; font-weight: 600; margin-bottom: 28px;
+}
+
+.classes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.class-card {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 24px; position: relative; overflow: hidden;
+}
+.class-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+}
+.class-slot {
+    font-size: 12px; color: #a5b4fc; font-weight: 600; margin-bottom: 12px;
+    background: rgba(99,102,241,0.1); display: inline-block;
+    padding: 4px 12px; border-radius: 6px;
+}
+.class-subject { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 16px; }
+.class-details { display: flex; flex-direction: column; gap: 8px; }
+.detail-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255,255,255,0.6); }
+.detail-icon { font-size: 16px; width: 20px; }
+
+.empty-state {
+    text-align: center; padding: 80px 0; color: rgba(255,255,255,0.3);
+}
+.empty-state .icon { font-size: 64px; margin-bottom: 16px; display: block; }
+.empty-state h3 { font-size: 20px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h2>🎓 Teacher Portal</h2>
+        <p>Free Slot Finder System</p>
+    </div>
+    <a href="/dashboard"         class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/today-classes"     class="nav-item active"><span class="nav-icon">📅</span> Today's Classes</a>
+    <a href="/free-slots-page"   class="nav-item"><span class="nav-icon">🔍</span> Find Free Slots</a>
+    <a href="/book-room-page"    class="nav-item"><span class="nav-icon">📌</span> Book a Room</a>
+    <a href="/weekly-schedule"   class="nav-item"><span class="nav-icon">🗓️</span> Weekly Schedule</a>
+    <a href="/profile"           class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <div class="sidebar-bottom">
+        <div class="teacher-name" id="sidebarName">Loading...</div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title">📅 Today's Classes</div>
+    <div class="page-sub">Your complete class schedule for today</div>
+
+    <div class="day-badge" id="dayBadge">Loading...</div>
+
+    <div class="classes-grid" id="classGrid">
+        <div class="empty-state">
+            <span class="icon">⏳</span>
+            <h3>Loading...</h3>
+        </div>
+    </div>
+</div>
+
+<script>
+const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const dayShort = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+const today = new Date();
+document.getElementById('dayBadge').textContent =
+    days[today.getDay()] + ', ' + today.toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
+
+fetch('/api/me')
+    .then(r => r.json())
+    .then(me => {
+        if (me.error) { window.location.href = '/login'; return; }
+        document.getElementById('sidebarName').textContent = me.name;
+
+        return fetch('/teacher_classes_today/' + me.teacher_id);
+    })
+    .then(r => r.json())
+    .then(classes => {
+        const grid = document.getElementById('classGrid');
+        if (!classes || classes.length === 0) {
+            grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+                <span class="icon">🎉</span>
+                <h3>No classes today!</h3>
+                <p>Enjoy your free day or <a href="/book-room-page" style="color:#6366f1">book a room</a>.</p>
+            </div>`;
+            return;
+        }
+        // Using sorting — classes already sorted by slot from server
+        grid.innerHTML = classes.map((c, i) => `
+            <div class="class-card">
+                <div class="class-slot">Slot ${i+1} &nbsp;|&nbsp; ${c.slot}</div>
+                <div class="class-subject">${c.subject}</div>
+                <div class="class-details">
+                    <div class="detail-row"><span class="detail-icon">📍</span>${c.room}</div>
+                    <div class="detail-row"><span class="detail-icon">👤</span>${c.teacher}</div>
+                    <div class="detail-row"><span class="detail-icon">📆</span>${c.day}</div>
+                </div>
+            </div>
+        `).join('');
+    })
+    .catch(() => window.location.href = '/login');
+</script>
+
+</body>
+</html>

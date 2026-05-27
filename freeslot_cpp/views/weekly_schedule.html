@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Weekly Schedule — Teacher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+.sidebar {
+    width: 240px; background: #1e293b; border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh;
+}
+.sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; color: #fff; }
+.sidebar-logo p  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; color: rgba(255,255,255,0.55); font-size: 14px;
+    text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+}
+.nav-item:hover  { color: #fff; background: rgba(255,255,255,0.05); }
+.nav-item.active { color: #6366f1; border-left-color: #6366f1; background: rgba(99,102,241,0.08); }
+.nav-icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-bottom { margin-top: auto; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.teacher-name { font-size: 13px; font-weight: 600; color: #fff; }
+.btn-logout {
+    display: block; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; border-radius: 8px; padding: 10px; font-size: 13px;
+    margin-top: 12px; text-align: center; text-decoration: none;
+}
+.main { margin-left: 240px; flex: 1; padding: 32px; overflow-x: auto; }
+.page-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.page-sub   { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 32px; }
+
+.controls {
+    display: flex; gap: 16px; align-items: center; margin-bottom: 28px;
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 20px;
+}
+select {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 14px;
+    font-family: 'Inter',sans-serif; outline: none; flex: 1;
+}
+select option { background: #1e293b; }
+.btn-load {
+    background: linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none;
+    border-radius:10px; padding:11px 24px; font-size:14px; font-weight:600;
+    cursor:pointer; font-family:'Inter',sans-serif; white-space:nowrap;
+}
+
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+th {
+    background: #1e293b; color: rgba(255,255,255,0.7);
+    font-size: 12px; font-weight: 600; padding: 12px 16px;
+    border: 1px solid rgba(255,255,255,0.06); letter-spacing: 0.5px;
+}
+td {
+    background: #0f172a; border: 1px solid rgba(255,255,255,0.06);
+    padding: 10px 14px; font-size: 12px; vertical-align: middle; text-align: center;
+    min-width: 100px;
+}
+.busy-cell {
+    background: rgba(99,102,241,0.08); color: #a5b4fc;
+    font-weight: 600; border-radius: 6px; padding: 6px 8px;
+}
+.free-cell { color: rgba(255,255,255,0.2); font-size: 11px; }
+.day-cell {
+    background: #1e293b; font-weight: 700; color: #fff;
+    font-size: 13px; text-align: left; padding-left: 20px;
+    border-left: 3px solid #6366f1;
+}
+.empty-msg { color: rgba(255,255,255,0.3); text-align:center; padding: 40px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h2>🎓 Teacher Portal</h2>
+        <p>Free Slot Finder System</p>
+    </div>
+    <a href="/dashboard"         class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/today-classes"     class="nav-item"><span class="nav-icon">📅</span> Today's Classes</a>
+    <a href="/free-slots-page"   class="nav-item"><span class="nav-icon">🔍</span> Find Free Slots</a>
+    <a href="/book-room-page"    class="nav-item"><span class="nav-icon">📌</span> Book a Room</a>
+    <a href="/weekly-schedule"   class="nav-item active"><span class="nav-icon">🗓️</span> Weekly Schedule</a>
+    <a href="/profile"           class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <div class="sidebar-bottom">
+        <div class="teacher-name" id="sidebarName">Loading...</div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title">🗓️ Weekly Schedule</div>
+    <div class="page-sub">Full week timetable for any teacher</div>
+
+    <div class="controls">
+        <select id="teacherSelect"><option value="">Loading teachers...</option></select>
+        <button class="btn-load" onclick="loadSchedule()">Load Schedule</button>
+    </div>
+
+    <div id="tableArea"><div class="empty-msg">Select a teacher to see their weekly schedule</div></div>
+</div>
+
+<script>
+const slotMap = {
+    1:"08:00-08:55", 2:"08:55-09:50", 3:"10:10-11:05", 4:"11:05-12:00",
+    5:"12:00-12:55", 6:"12:55-01:50", 7:"02:10-03:05", 8:"03:05-04:00",
+    9:"04:00-04:55", 10:"04:55-05:50"
+};
+const days = ["MON","TUE","WED","THU","FRI","SAT"];
+
+fetch('/api/me').then(r=>r.json()).then(me => {
+    if (me.error) { window.location.href='/login'; return; }
+    document.getElementById('sidebarName').textContent = me.name;
+    // Auto-select logged-in teacher and load their schedule
+    return fetch('/teachers');
+}).then(r => r ? r.json() : null).then(list => {
+    if (!list) return;
+    const sel = document.getElementById('teacherSelect');
+    sel.innerHTML = '<option value="">-- Select Teacher --</option>';
+    list.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.teacher_id;
+        opt.textContent = t.name;
+        sel.appendChild(opt);
+    });
+}).catch(() => window.location.href='/login');
+
+function loadSchedule() {
+    const tid = document.getElementById('teacherSelect').value;
+    if (!tid) return;
+
+    fetch('/api/weekly_schedule/' + tid)
+        .then(r => r.json())
+        .then(data => {
+            // Using sorting — server returns data sorted by day+slot
+            // Build schedule grid: day -> slot -> subject+room
+            const grid = {};
+            days.forEach(d => { grid[d] = {}; for(let s=1;s<=10;s++) grid[d][s]=""; });
+            const reverseSlot = {};
+            for(let k in slotMap) reverseSlot[slotMap[k]] = parseInt(k);
+
+            data.forEach(item => {
+                const sn = reverseSlot[item.slot] || parseInt(item.slot);
+                if(grid[item.day] && sn) grid[item.day][sn] = item.subject + '<br><small>' + item.room + '</small>';
+            });
+
+            let html = '<table><tr><th>Day</th>';
+            for(let s=1;s<=10;s++) html += '<th>' + slotMap[s] + '</th>';
+            html += '</tr>';
+            days.forEach(d => {
+                html += '<tr><td class="day-cell">' + d + '</td>';
+                for(let s=1;s<=10;s++) {
+                    const v = grid[d][s];
+                    html += v ? '<td><div class="busy-cell">' + v + '</div></td>'
+                              : '<td><div class="free-cell">Free</div></td>';
+                }
+                html += '</tr>';
+            });
+            html += '</table>';
+            document.getElementById('tableArea').innerHTML = html;
+        });
+}
+</script>
+
+</body>
+</html>

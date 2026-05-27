@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Profile — Teacher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+.sidebar {
+    width: 240px; background: #1e293b; border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh;
+}
+.sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; color: #fff; }
+.sidebar-logo p  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; color: rgba(255,255,255,0.55); font-size: 14px;
+    text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+}
+.nav-item:hover  { color: #fff; background: rgba(255,255,255,0.05); }
+.nav-item.active { color: #6366f1; border-left-color: #6366f1; background: rgba(99,102,241,0.08); }
+.nav-icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-bottom { margin-top: auto; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.teacher-name { font-size: 13px; font-weight: 600; color: #fff; }
+.btn-logout {
+    display: block; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; border-radius: 8px; padding: 10px; font-size: 13px;
+    margin-top: 12px; text-align: center; text-decoration: none;
+}
+.main { margin-left: 240px; flex: 1; padding: 32px; }
+.page-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.page-sub   { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 32px; }
+
+.profile-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+.profile-card {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 32px; text-align: center;
+}
+.avatar {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; margin: 0 auto 20px; color: #fff;
+}
+.profile-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.profile-dept { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 20px; }
+.profile-id   {
+    background: rgba(99,102,241,0.1); color: #a5b4fc;
+    border-radius: 8px; padding: 8px 16px; font-size: 12px;
+    display: inline-block;
+}
+
+.info-card {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 28px;
+}
+.info-card h3 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 24px; }
+.info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 13px; color: rgba(255,255,255,0.4); }
+.info-value { font-size: 14px; color: #fff; font-weight: 500; }
+
+.change-pass {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; padding: 28px; margin-top: 24px;
+    grid-column: 1 / -1;
+}
+.change-pass h3 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 24px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; align-items: end; }
+label { font-size: 12px; color: rgba(255,255,255,0.5); display: block; margin-bottom: 8px; }
+input[type=password] {
+    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 12px 14px; color: #fff; font-size: 14px;
+    font-family: 'Inter',sans-serif; outline: none;
+}
+input[type=password]:focus { border-color: #6366f1; }
+input[type=password]::placeholder { color: rgba(255,255,255,0.25); }
+.btn-save {
+    background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff;
+    border: none; border-radius: 10px; padding: 12px 24px;
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family:'Inter',sans-serif;
+    white-space: nowrap; transition: opacity 0.2s;
+}
+.btn-save:hover { opacity: 0.9; }
+.msg { font-size: 13px; margin-top: 12px; }
+.msg.ok  { color: #86efac; }
+.msg.err { color: #fca5a5; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h2>🎓 Teacher Portal</h2>
+        <p>Free Slot Finder System</p>
+    </div>
+    <a href="/dashboard"         class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/today-classes"     class="nav-item"><span class="nav-icon">📅</span> Today's Classes</a>
+    <a href="/free-slots-page"   class="nav-item"><span class="nav-icon">🔍</span> Find Free Slots</a>
+    <a href="/book-room-page"    class="nav-item"><span class="nav-icon">📌</span> Book a Room</a>
+    <a href="/weekly-schedule"   class="nav-item"><span class="nav-icon">🗓️</span> Weekly Schedule</a>
+    <a href="/profile"           class="nav-item active"><span class="nav-icon">👤</span> My Profile</a>
+    <div class="sidebar-bottom">
+        <div class="teacher-name" id="sidebarName">Loading...</div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title">👤 My Profile</div>
+    <div class="page-sub">Your account information</div>
+
+    <div class="profile-grid">
+        <!-- Left: Avatar card -->
+        <div class="profile-card">
+            <div class="avatar" id="avatarIcon">👤</div>
+            <div class="profile-name" id="profName">Loading...</div>
+            <div class="profile-dept" id="profDept">Department</div>
+            <div class="profile-id"  id="profId">ID: —</div>
+        </div>
+
+        <!-- Right: Info -->
+        <div class="info-card">
+            <h3>Account Details</h3>
+            <div class="info-row">
+                <span class="info-label">Full Name</span>
+                <span class="info-value" id="infoName">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Teacher ID</span>
+                <span class="info-value" id="infoId">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Department</span>
+                <span class="info-value" id="infoDept">—</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email</span>
+                <span class="info-value" id="infoEmail">Not set</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Password</span>
+                <span class="info-value">••••••••</span>
+            </div>
+        </div>
+
+        <!-- Change password -->
+        <div class="change-pass">
+            <h3>🔑 Change Password</h3>
+            <div class="form-row">
+                <div>
+                    <label>Current Password</label>
+                    <input type="password" id="oldPass" placeholder="Current password">
+                </div>
+                <div>
+                    <label>New Password</label>
+                    <input type="password" id="newPass" placeholder="New password">
+                </div>
+                <div>
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confPass" placeholder="Confirm password">
+                </div>
+                <div>
+                    <button class="btn-save" onclick="changePassword()">Update</button>
+                </div>
+            </div>
+            <div id="passMsg" class="msg"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+let myTeacherName = '';
+
+fetch('/api/me')
+    .then(r => r.json())
+    .then(me => {
+        if (me.error) { window.location.href = '/login'; return; }
+        myTeacherName = me.name;
+        document.getElementById('sidebarName').textContent = me.name;
+        document.getElementById('profName').textContent    = me.name;
+        document.getElementById('profDept').textContent   = me.department || 'Faculty';
+        document.getElementById('profId').textContent     = 'ID: ' + me.teacher_id;
+        document.getElementById('infoName').textContent   = me.name;
+        document.getElementById('infoId').textContent     = me.teacher_id;
+        document.getElementById('infoDept').textContent   = me.department || '—';
+        document.getElementById('infoEmail').textContent  = me.email || 'Not set';
+        // Set avatar initials
+        const initials = me.name.split(' ').filter(w=>w.length>1).slice(0,2).map(w=>w[0]).join('');
+        document.getElementById('avatarIcon').textContent = initials || '👤';
+    })
+    .catch(() => window.location.href = '/login');
+
+function changePassword() {
+    const oldP  = document.getElementById('oldPass').value.trim();
+    const newP  = document.getElementById('newPass').value.trim();
+    const confP = document.getElementById('confPass').value.trim();
+    const msg   = document.getElementById('passMsg');
+
+    if (!oldP || !newP || !confP) { msg.textContent='Fill all fields.'; msg.className='msg err'; return; }
+    if (newP !== confP)            { msg.textContent='New passwords do not match.'; msg.className='msg err'; return; }
+    if (newP.length < 4)           { msg.textContent='Password too short (min 4 chars).'; msg.className='msg err'; return; }
+
+    fetch('/api/change-password', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ name: myTeacherName, old_password: oldP, new_password: newP })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (d.status === 'success') {
+            msg.textContent = '✅ Password updated successfully!';
+            msg.className = 'msg ok';
+            document.getElementById('oldPass').value  = '';
+            document.getElementById('newPass').value  = '';
+            document.getElementById('confPass').value = '';
+        } else {
+            msg.textContent = d.message || 'Update failed.';
+            msg.className = 'msg err';
+        }
+    });
+}
+</script>
+
+</body>
+</html>

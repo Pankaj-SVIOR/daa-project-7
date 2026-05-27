@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Section Timetable — Teacher Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0f172a; color: #e2e8f0; display: flex; min-height: 100vh; }
+.sidebar {
+    width: 240px; background: #1e293b; border-right: 1px solid rgba(255,255,255,0.06);
+    display: flex; flex-direction: column; padding: 24px 0; position: fixed; height: 100vh;
+}
+.sidebar-logo { padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+.sidebar-logo h2 { font-size: 16px; font-weight: 700; color: #fff; }
+.sidebar-logo p  { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 20px; color: rgba(255,255,255,0.55); font-size: 14px;
+    text-decoration: none; transition: all 0.2s; border-left: 3px solid transparent;
+}
+.nav-item:hover  { color: #fff; background: rgba(255,255,255,0.05); }
+.nav-item.active { color: #6366f1; border-left-color: #6366f1; background: rgba(99,102,241,0.08); }
+.nav-icon { font-size: 18px; width: 22px; text-align: center; }
+.sidebar-bottom { margin-top: auto; padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+.teacher-name { font-size: 13px; font-weight: 600; color: #fff; }
+.btn-logout {
+    display: block; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2);
+    color: #fca5a5; border-radius: 8px; padding: 10px; font-size: 13px;
+    margin-top: 12px; text-align: center; text-decoration: none;
+}
+.main { margin-left: 240px; flex: 1; padding: 32px; overflow-x: auto; }
+.page-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.page-sub   { color: rgba(255,255,255,0.4); font-size: 14px; margin-bottom: 28px; }
+
+.controls {
+    display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 20px; margin-bottom: 24px;
+}
+.ctrl-group { display: flex; flex-direction: column; gap: 6px; }
+label { font-size: 12px; color: rgba(255,255,255,0.4); }
+select, input {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px 14px; color: #fff; font-size: 14px;
+    font-family: 'Inter',sans-serif; outline: none; min-width: 150px;
+}
+select option { background: #1e293b; }
+.btn-load {
+    background: linear-gradient(135deg,#6366f1,#8b5cf6); color:#fff; border:none;
+    border-radius:10px; padding:11px 24px; font-size:14px; font-weight:600;
+    cursor:pointer; font-family:'Inter',sans-serif;
+}
+.section-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+.tab-btn {
+    padding: 8px 20px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.6);
+    cursor: pointer; font-size: 13px; font-weight: 600; font-family:'Inter',sans-serif;
+    transition: all 0.2s;
+}
+.tab-btn:hover  { background: rgba(255,255,255,0.08); color: #fff; }
+.tab-btn.active { background: linear-gradient(135deg,#6366f1,#8b5cf6); color: #fff; border-color: transparent; }
+
+table { width: 100%; border-collapse: collapse; min-width: 800px; }
+th {
+    background: #1e293b; color: rgba(255,255,255,0.6);
+    font-size: 11px; font-weight: 600; padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,0.06); letter-spacing: 0.5px; text-align: center;
+}
+td {
+    background: #0f172a; border: 1px solid rgba(255,255,255,0.05);
+    padding: 8px 10px; font-size: 11px; vertical-align: top; text-align: center;
+    min-width: 90px;
+}
+.day-cell {
+    background: #1e293b; font-weight: 700; color: #fff; font-size: 12px;
+    text-align: left; padding-left: 14px; border-left: 3px solid #6366f1;
+}
+.cell-busy {
+    background: rgba(99,102,241,0.08); border-radius: 6px;
+    padding: 4px 6px; margin: 2px 0; color: #a5b4fc; font-weight: 600;
+}
+.cell-busy .room { color: rgba(255,255,255,0.35); font-weight: 400; font-size: 10px; }
+.cell-busy .teacher { color: rgba(255,255,255,0.4); font-size: 10px; }
+.cell-pbl { background: rgba(234,179,8,0.1); color: #fde047; border-radius:6px; padding:4px 6px; font-weight:600; }
+.cell-lab { background: rgba(34,197,94,0.1); color: #86efac; border-radius:6px; padding:4px 6px; font-weight:600; }
+.cell-free { color: rgba(255,255,255,0.15); font-size: 10px; }
+
+.search-bar {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px; padding: 16px 20px; margin-bottom: 16px;
+    display: flex; gap: 12px; align-items: center;
+}
+.search-bar input { flex: 1; }
+.search-result {
+    background: #1e293b; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.s-subj { font-size: 14px; color: #fff; font-weight: 600; }
+.s-meta { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; }
+.badge-slot {
+    background: rgba(99,102,241,0.15); color: #a5b4fc;
+    border-radius:8px; padding:4px 12px; font-size:12px; font-weight:600; white-space:nowrap;
+}
+.empty-msg { color: rgba(255,255,255,0.3); text-align:center; padding: 40px; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <h2>🎓 Teacher Portal</h2>
+        <p>Free Slot Finder System</p>
+    </div>
+    <a href="/dashboard"         class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/today-classes"     class="nav-item"><span class="nav-icon">📅</span> Today's Classes</a>
+    <a href="/free-slots-page"   class="nav-item"><span class="nav-icon">🔍</span> Find Free Slots</a>
+    <a href="/book-room-page"    class="nav-item"><span class="nav-icon">📌</span> Book a Room</a>
+    <a href="/weekly-schedule"   class="nav-item"><span class="nav-icon">🗓️</span> Weekly Schedule</a>
+    <a href="/section-timetable" class="nav-item active"><span class="nav-icon">📋</span> Section Timetable</a>
+    <a href="/profile"           class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+    <div class="sidebar-bottom">
+        <div class="teacher-name" id="sidebarName">Loading...</div>
+        <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
+</div>
+
+<div class="main">
+    <div class="page-title">📋 Section Timetable</div>
+    <div class="page-sub">View full week timetable for any section</div>
+
+    <div class="section-tabs" id="sectionTabs"></div>
+
+    <div class="search-bar">
+        <input type="text" id="searchBox" placeholder="🔍 Search subject or teacher in this section..." oninput="filterSearch()">
+    </div>
+    <div id="searchResults" style="display:none"></div>
+
+    <div id="tableArea"><div class="empty-msg">Select a section above to view timetable</div></div>
+</div>
+
+<script>
+const SECTIONS = ["A1","A2","B1","B2","C1"];
+const slotTimes = {
+    1:"08:00-08:55", 2:"08:55-09:50", 3:"10:10-11:05", 4:"11:05-12:00",
+    5:"12:00-12:55", 6:"12:55-01:50", 7:"02:10-03:05", 8:"03:05-04:00",
+    9:"04:00-04:55", 10:"04:55-05:50"
+};
+const DAYS = ["MON","TUE","WED","THU","FRI","SAT"];
+let currentSection = "";
+let currentData = [];
+
+fetch('/api/me').then(r=>r.json()).then(me => {
+    if (me.error) { window.location.href='/login'; return; }
+    document.getElementById('sidebarName').textContent = me.name;
+});
+
+// Build section tabs
+const tabsDiv = document.getElementById('sectionTabs');
+SECTIONS.forEach(sec => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.textContent = sec;
+    btn.id = 'tab-' + sec;
+    btn.onclick = () => loadSection(sec);
+    tabsDiv.appendChild(btn);
+});
+
+function loadSection(sec) {
+    currentSection = sec;
+    SECTIONS.forEach(s => {
+        const b = document.getElementById('tab-'+s);
+        if (b) b.className = 'tab-btn' + (s===sec?' active':'');
+    });
+    document.getElementById('searchBox').value = '';
+    document.getElementById('searchResults').style.display = 'none';
+    document.getElementById('tableArea').innerHTML = '<div class="empty-msg">Loading...</div>';
+
+    fetch('/api/section_timetable/' + sec)
+        .then(r => r.json())
+        .then(data => {
+            currentData = data;
+            renderTable(data);
+        });
+}
+
+function renderTable(data) {
+    // Build grid: day -> slot -> [entries]
+    const grid = {};
+    DAYS.forEach(d => { grid[d] = {}; });
+    data.forEach(entry => {
+        const sn = entry.slot_num;
+        if (!grid[entry.day]) grid[entry.day] = {};
+        if (!grid[entry.day][sn]) grid[entry.day][sn] = [];
+        grid[entry.day][sn].push(entry);
+    });
+
+    let html = '<table><tr><th style="min-width:60px">Day</th>';
+    for (let s = 1; s <= 10; s++) html += '<th>' + slotTimes[s] + '</th>';
+    html += '</tr>';
+
+    DAYS.forEach(day => {
+        html += '<tr><td class="day-cell">' + day + '</td>';
+        for (let s = 1; s <= 10; s++) {
+            const entries = grid[day][s] || [];
+            if (!entries.length) {
+                html += '<td><div class="cell-free">—</div></td>';
+            } else {
+                html += '<td>';
+                entries.forEach(e => {
+                    const subj = e.subject;
+                    const isPBL = subj.indexOf('PROJECT') >= 0;
+                    const isLab = subj.indexOf('Lab') >= 0 || subj.indexOf('LAB') >= 0;
+                    const cls = isPBL ? 'cell-pbl' : (isLab ? 'cell-lab' : 'cell-busy');
+                    html += '<div class="'+cls+'">' + subj +
+                            '<div class="room">📍 '+e.room+'</div>' +
+                            '<div class="teacher">👤 '+e.teacher+'</div>' +
+                            '</div>';
+                });
+                html += '</td>';
+            }
+        }
+        html += '</tr>';
+    });
+    html += '</table>';
+    document.getElementById('tableArea').innerHTML = html;
+}
+
+function filterSearch() {
+    const q = document.getElementById('searchBox').value.trim().toLowerCase();
+    const resDiv = document.getElementById('searchResults');
+    if (!q || !currentData.length) { resDiv.style.display='none'; return; }
+
+    const matches = currentData.filter(e =>
+        e.subject.toLowerCase().includes(q) || e.teacher.toLowerCase().includes(q)
+    );
+    if (!matches.length) {
+        resDiv.innerHTML = '<div class="empty-msg">No results found.</div>';
+        resDiv.style.display = 'block';
+        return;
+    }
+    resDiv.innerHTML = matches.map(e =>
+        `<div class="search-result">
+            <div>
+                <div class="s-subj">${e.subject}</div>
+                <div class="s-meta">👤 ${e.teacher} &nbsp; 📍 ${e.room}</div>
+            </div>
+            <div class="badge-slot">${e.day} · ${slotTimes[e.slot_num]||e.slot_num}</div>
+        </div>`
+    ).join('');
+    resDiv.style.display = 'block';
+}
+
+// Auto-load A1 on page load
+loadSection('A1');
+</script>
+
+</body>
+</html>
